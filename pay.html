@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PayQR – Instant UPI QR for your shop</title>
+<style>
+:root{--bg:#f4f5fb;--card:#fff;--tx:#12151f;--mu:#6b7285;--bd:#e5e7f0;--ac:#5b3df5;--ac2:#fff;--g1:#5b3df5;--g2:#9a5bff;--ok:#12a150;--okbg:#e6f6ee;--wn:#b54708;--wnbg:#fff3e0;--er:#d92d20;--sh:0 8px 24px rgba(40,30,120,.08);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1017;--card:#171b25;--tx:#eef0f6;--mu:#97a0b4;--bd:#272d3d;--ac:#8b7bff;--ac2:#0d1017;--g1:#4a32d6;--g2:#7d49e6;--ok:#3ddc84;--okbg:#12301f;--wn:#ffb257;--wnbg:#33260f;--er:#ff6b5e;--sh:0 8px 24px rgba(0,0,0,.35);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d1017;--card:#171b25;--tx:#eef0f6;--mu:#97a0b4;--bd:#272d3d;--ac:#8b7bff;--ac2:#0d1017;--g1:#4a32d6;--g2:#7d49e6;--ok:#3ddc84;--okbg:#12301f;--wn:#ffb257;--wnbg:#33260f;--er:#ff6b5e;--sh:0 8px 24px rgba(0,0,0,.35);color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+.wrap{max-width:460px;margin:0 auto;padding:16px 16px 40px}
+.hide{display:none!important}
+.hero{background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;border-radius:22px;padding:26px 22px 54px;box-shadow:var(--sh)}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px}
+.logo i{width:38px;height:38px;border-radius:12px;background:rgba(255,255,255,.2);display:grid;place-items:center;font-style:normal;font-size:20px}
+.hero h1{font-size:26px;line-height:1.2;margin:22px 0 6px}
+.hero p{margin:0;opacity:.88;font-size:14.5px;line-height:1.5}
+.steps{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.steps span{background:rgba(255,255,255,.18);padding:6px 10px;border-radius:99px;font-size:12px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:20px;box-shadow:var(--sh);margin-bottom:16px}
+.pull{margin-top:-34px;position:relative}
+.tabs{display:flex;background:var(--bg);border-radius:12px;padding:4px;margin-bottom:6px}
+.tabs button{flex:1;padding:10px;border:0;background:transparent;color:var(--mu);border-radius:9px;font-size:15px;font-weight:600;cursor:pointer}
+.tabs button.on{background:var(--card);color:var(--tx);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+label{display:block;font-size:13px;font-weight:600;color:var(--mu);margin:14px 0 6px}
+input{width:100%;padding:13px 14px;border:1.5px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--tx);font-size:16px;font-family:inherit}
+input:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 22%,transparent)}
+.pwbox{position:relative;display:flex;align-items:center}
+.pwbox input{padding-right:64px}
+.pwbtn{position:absolute;right:8px;background:transparent;border:0;color:var(--ac);font-size:13px;font-weight:700;cursor:pointer;padding:6px 10px;border-radius:8px}
+.btn{display:block;width:100%;margin-top:18px;padding:14px;border:0;border-radius:14px;background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;font-size:16px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;font-family:inherit}
+.btn:active{transform:scale(.99)}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--tx);border:1.5px solid var(--bd);margin-top:10px}
+.msg{font-size:14px;margin-top:12px;min-height:18px;color:var(--er)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:4px 0 16px}
+.who{display:flex;align-items:center;gap:12px;min-width:0}
+.av{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;display:grid;place-items:center;font-weight:700;font-size:18px;flex:none}
+.who b{display:block;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.small{font-size:13px;color:var(--mu)}
+.chip{background:var(--card);border:1px solid var(--bd);color:var(--tx);padding:8px 12px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:12px;box-shadow:var(--sh)}
+.stat small{display:block;color:var(--mu);font-size:11.5px;margin-bottom:4px}
+.stat b{font-size:16px}
+.stat.ok b{color:var(--ok)}.stat.wn b{color:var(--wn)}
+.amtbox{display:flex;align-items:center;gap:8px;border:1.5px solid var(--bd);border-radius:16px;padding:6px 16px;background:var(--bg)}
+.amtbox:focus-within{border-color:var(--ac)}
+.amtbox span{font-size:32px;font-weight:700;color:var(--mu)}
+.amtbox input{border:0;background:transparent;font-size:36px;font-weight:700;padding:8px 0;box-shadow:none!important}
+.quick{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.quick button{flex:1;min-width:64px;padding:9px;border-radius:10px;border:1px solid var(--bd);background:transparent;color:var(--tx);font-weight:600;cursor:pointer;font-size:14px}
+.qhead{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--ok);font-weight:600;font-size:14px}
+.amt{font-size:40px;font-weight:800;margin:6px 0 2px;letter-spacing:-.5px}
+#qr{display:flex;justify-content:center;margin:16px 0 8px}
+#qr img,#qr canvas{background:#fff;padding:14px;border-radius:18px;max-width:100%;box-shadow:var(--sh);border:1px solid var(--bd)}
+.center{text-align:center}
+.lock{display:inline-block;background:var(--okbg);color:var(--ok);font-size:12px;font-weight:600;padding:5px 10px;border-radius:99px}
+.sec{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--bd);gap:10px}
+.row:last-child{border:0}
+.row b{font-size:16px}
+.tag{font-size:12px;font-weight:600;padding:6px 11px;border-radius:99px;border:0;cursor:pointer;background:var(--wnbg);color:var(--wn)}
+.tag.paid{background:var(--okbg);color:var(--ok)}
+.empty{text-align:center;padding:22px 0;color:var(--mu);font-size:14px}
+.ask{font-weight:700;margin:16px 0 0;font-size:16px}
+.yn{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn.yes{background:linear-gradient(135deg,#12a150,#0b7d3e)}
+.btn.no{background:transparent;color:var(--tx);border:1.5px solid var(--bd)}
+.day{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--mu);padding:14px 0 8px;border-bottom:1px solid var(--bd)}
+.day.today{color:var(--ac)}
+.day.today span:first-child{background:var(--ac);color:var(--ac2);padding:3px 10px;border-radius:99px}
+.bars{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end;height:140px;margin-top:10px}
+.bar{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px;font-size:11px;color:var(--mu);min-width:0}
+.bar i{display:block;width:100%;max-width:30px;border-radius:8px 8px 4px 4px;background:linear-gradient(180deg,var(--g2),var(--g1));min-height:3px}
+.bar.z i{background:var(--bd)}
+.bar b{font-size:10.5px;color:var(--tx);font-weight:600;height:13px}
+.bar em{font-style:normal}
+.bar.t em{color:var(--ac);font-weight:700}
+.note{font-size:12px;color:var(--mu);line-height:1.6;text-align:center;padding:0 8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div id="auth">
+  <div class="hero">
+    <div class="logo"><i>₹</i>PayQR</div>
+    <h1>Get paid in one scan.</h1>
+    <p>Enter the amount, show the QR, and your customer pays exactly that, straight to your UPI ID.</p>
+    <div class="steps"><span>1 · Enter amount</span><span>2 · Show QR</span><span>3 · Get paid</span></div>
+  </div>
+  <div class="card pull">
+    <div class="tabs"><button id="tL" class="on">Log in</button><button id="tS">Sign up</button></div>
+    <div id="sOnly" class="hide">
+      <label>Your name</label><input id="name" autocomplete="name" placeholder="Rahul Sharma">
+      <label>Shop / business name</label><input id="shop" placeholder="Sharma General Store">
+      <label>UPI ID</label><input id="upi" placeholder="yourname@okhdfcbank" autocapitalize="none" autocomplete="off">
+    </div>
+    <label>Email or mobile number</label><input id="uid" autocapitalize="none" autocomplete="username" placeholder="you@example.com or 9876543210">
+    <label>Password</label>
+    <div class="pwbox">
+      <input id="pw" type="password" autocomplete="current-password" placeholder="At least 6 characters">
+      <button type="button" class="pwbtn" id="togglePw">Show</button>
+    </div>
+    <button class="btn" id="goAuth">Log in</button>
+    <div class="msg" id="aMsg"></div>
+  </div>
+</div>
+
+<div id="app" class="hide">
+  <div class="top">
+    <div class="who"><div class="av" id="av"></div><div style="min-width:0"><b id="hShop"></b><div class="small" id="hUpi"></div></div></div>
+    <button class="chip" id="out">Log out</button>
+  </div>
+
+  <div class="stats">
+    <div class="stat ok"><small>Today’s sale</small><b id="sAll">₹0</b></div>
+    <div class="stat"><small>Payments today</small><b id="sCnt">0</b></div>
+    <div class="stat"><small>All time</small><b id="sTot">₹0</b></div>
+  </div>
+
+  <div class="card" id="newSale">
+    <div class="sec"><strong>New sale</strong><span class="small">Amount is locked in the QR</span></div>
+    <div class="amtbox"><span>₹</span><input id="amt" type="number" inputmode="decimal" min="1" step="0.01" placeholder="0.00"></div>
+    <div class="quick"><button data-a="50">+50</button><button data-a="100">+100</button><button data-a="500">+500</button><button data-a="1000">+1000</button></div>
+    <label>Item or note (optional)</label>
+    <input id="nt" maxlength="40" placeholder="e.g. 2 kg rice">
+    <button class="btn" id="gen">Generate QR code</button>
+    <div class="msg" id="gMsg"></div>
+  </div>
+
+  <div class="card hide center" id="qrCard">
+    <div class="qhead">● Ready to scan</div>
+    <div class="amt" id="qAmt"></div>
+    <div class="small" id="qNote"></div>
+    <div id="qr"></div>
+    <span class="lock">🔒 Fixed amount</span>
+    <div class="small" style="margin-top:10px">Paying to <b id="qTo"></b></div>
+    <a class="btn" id="payLink">Open UPI app on this phone</a>
+    <div class="ask">Payment received from customer?</div>
+    <div class="yn" style="margin-top:4px"><button class="btn yes" id="yes">Yes, received</button><button class="btn no" id="no">No</button></div>
+    <div class="small" style="margin-top:10px">The sale is saved only if you tap Yes.</div>
+  </div>
+
+  <div class="card">
+    <div class="sec"><strong>Last 7 days</strong><span class="small" id="wTot"></span></div>
+    <div class="bars" id="bars"></div>
+    <div class="small" id="wAvg" style="margin-top:10px"></div>
+  </div>
+
+  <div class="card">
+    <div class="sec"><strong>Sales history</strong><span class="small">Date-wise · confirmed only</span></div>
+    <div id="list"><div class="empty">Loading your sales...</div></div>
+  </div>
+  <p class="note">Your account and sales data are securely synced to the cloud. Money goes directly from the customer’s UPI app to your UPI ID. Check your bank or UPI app before tapping “Yes, received”.</p>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDvyjG7ngMlgOTgcBCLNaRrotdYpCfawRI",
+  authDomain: "myqr-2440c.firebaseapp.com",
+  projectId: "myqr-2440c",
+  storageBucket: "myqr-2440c.firebasestorage.app",
+  messagingSenderId: "130582895345",
+  appId: "1:130582895345:web:3481cdc13cb4e07671a750"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const auth = getAuth(fbApp);
+const db = getFirestore(fbApp);
+
+const $ = id => document.getElementById(id);
+let mode = 'L';
+let curUser = null;
+let curProfile = null;
+let salesCache = [];
+let pending = null;
+let isSigningUp = false;
+
+const toAuthEmail = val => val.includes('@') ? val : `${val.replace(/\D/g, '')}@payqr.app`;
+
+// Show / Hide Password toggle
+$('togglePw').onclick = () => {
+  const pw = $('pw');
+  const isHidden = pw.type === 'password';
+  pw.type = isHidden ? 'text' : 'password';
+  $('togglePw').textContent = isHidden ? 'Hide' : 'Show';
+};
+
+function setMode(m) {
+  mode = m;
+  $('tL').classList.toggle('on', m === 'L');
+  $('tS').classList.toggle('on', m === 'S');
+  $('sOnly').classList.toggle('hide', m === 'L');
+  $('goAuth').textContent = m === 'L' ? 'Log in' : 'Create account';
+  $('aMsg').textContent = '';
+  $('pw').autocomplete = m === 'L' ? 'current-password' : 'new-password';
+}
+$('tL').onclick = () => setMode('L');
+$('tS').onclick = () => setMode('S');
+
+async function openDashboard(user, profile) {
+  curUser = user;
+  curProfile = profile;
+  $('hShop').textContent = curProfile.shop;
+  $('hUpi').textContent = curProfile.upi;
+  $('av').textContent = curProfile.shop.trim()[0].toUpperCase();
+  $('auth').classList.add('hide');
+  $('app').classList.remove('hide');
+  $('pw').value = '';
+  resetSale();
+  await loadSales();
+}
+
+$('goAuth').onclick = async () => {
+  const rawId = $('uid').value.trim().toLowerCase();
+  const pw = $('pw').value;
+  const msg = $('aMsg');
+  const btn = $('goAuth');
+
+  if (!rawId || !pw) { msg.textContent = 'Please enter your email/mobile and password.'; return; }
+  const email = toAuthEmail(rawId);
+
+  btn.disabled = true;
+  msg.textContent = '';
+
+  try {
+    if (mode === 'S') {
+      const name = $('name').value.trim();
+      const shop = $('shop').value.trim();
+      const upi = $('upi').value.trim().toLowerCase();
+
+      if (!name || !shop) { msg.textContent = 'Please enter your name and shop name.'; btn.disabled = false; return; }
+      if (!/^[a-z0-9._-]{2,256}@[a-z][a-z0-9]{1,63}$/.test(upi)) { msg.textContent = 'That UPI ID looks invalid (example: name@bank).'; btn.disabled = false; return; }
+      if (pw.length < 6) { msg.textContent = 'Password must be at least 6 characters.'; btn.disabled = false; return; }
+
+      btn.textContent = 'Creating account...';
+      isSigningUp = true;
+      const cred = await createUserWithEmailAndPassword(auth, email, pw);
+      const profile = { name, shop, upi, loginId: rawId, createdAt: Date.now() };
+      await setDoc(doc(db, 'users', cred.user.uid), profile);
+      isSigningUp = false;
+      await openDashboard(cred.user, profile);
+    } else {
+      btn.textContent = 'Logging in...';
+      const cred = await signInWithEmailAndPassword(auth, email, pw);
+      const snap = await getDoc(doc(db, 'users', cred.user.uid));
+      if (snap.exists()) {
+        await openDashboard(cred.user, snap.data());
+      } else {
+        msg.textContent = 'Account found, but shop profile missing in Firestore. Please check Firestore Rules.';
+      }
+    }
+  } catch (err) {
+    isSigningUp = false;
+    const code = err.code || '';
+    if (code === 'auth/email-already-in-use') msg.textContent = 'Account already exists. Please log in.';
+    else if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found') msg.textContent = 'Incorrect email/mobile or password.';
+    else if (code === 'auth/invalid-email') msg.textContent = 'Please enter a valid email or mobile number.';
+    else if (code === 'permission-denied') msg.textContent = 'Firestore permission denied. Please publish Security Rules.';
+    else msg.textContent = err.message || 'Authentication failed. Please try again.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = mode === 'L' ? 'Log in' : 'Create account';
+  }
+};
+
+$('out').onclick = async () => {
+  await signOut(auth);
+};
+
+// Auto-login on page refresh
+onAuthStateChanged(auth, async (user) => {
+  if (isSigningUp) return;
+  if (user) {
+    try {
+      const snap = await getDoc(doc(db, 'users', user.uid));
+      if (snap.exists()) {
+        await openDashboard(user, snap.data());
+      }
+    } catch (e) {
+      $('aMsg').textContent = 'Could not load profile: ' + e.message;
+    }
+  } else {
+    curUser = null;
+    curProfile = null;
+    salesCache = [];
+    $('app').classList.add('hide');
+    $('auth').classList.remove('hide');
+  }
+});
+
+async function loadSales() {
+  if (!curUser) return;
+  $('list').innerHTML = '<div class="empty">Loading your sales...</div>';
+  try {
+    const q = query(collection(db, 'users', curUser.uid, 'sales'), orderBy('t', 'desc'));
+    const snap = await getDocs(q);
+    salesCache = snap.docs.map(d => ({ docId: d.id, ...d.data() }));
+    render();
+  } catch (e) {
+    $('list').innerHTML = '<div class="empty">Could not load sales. Check your connection.</div>';
+  }
+}
+
+const inr = n => '₹' + Number(n).toLocaleString('en-IN', { minimumFractionDigits: Number(n) % 1 ? 2 : 0, maximumFractionDigits: 2 });
+
+document.querySelectorAll('.quick button').forEach(b => b.onclick = () => {
+  $('amt').value = ((parseFloat($('amt').value) || 0) + Number(b.dataset.a)).toString();
+});
+
+$('gen').onclick = () => {
+  const a = parseFloat($('amt').value), note = $('nt').value.trim(), m = $('gMsg');
+  if (!(a > 0)) { m.textContent = 'Please enter a valid amount.'; return; }
+  if (a > 100000) { m.textContent = 'Amount must be ₹1,00,000 or less (UPI limit).'; return; }
+  m.textContent = '';
+
+  const amount = a.toFixed(2), tid = 'T' + Date.now().toString(36).toUpperCase();
+  const link = 'upi://pay?pa=' + encodeURIComponent(curProfile.upi) + '&pn=' + encodeURIComponent(curProfile.shop) +
+    '&am=' + amount + '&cu=INR&tn=' + encodeURIComponent(note || 'Payment') + '&tr=' + tid;
+
+  $('qAmt').textContent = inr(amount);
+  $('qNote').textContent = note;
+  $('qTo').textContent = curProfile.upi;
+  $('qr').innerHTML = '';
+  try {
+    new QRCode($('qr'), { text: link, width: 220, height: 220, correctLevel: QRCode.CorrectLevel.M });
+  } catch (e) {
+    $('qr').textContent = 'Could not load QR. Check your connection.';
+  }
+  $('payLink').href = link;
+  pending = { id: tid, amount, note };
+  $('newSale').classList.add('hide');
+  $('qrCard').classList.remove('hide');
+};
+
+function resetSale() {
+  pending = null;
+  $('qrCard').classList.add('hide');
+  $('newSale').classList.remove('hide');
+  $('amt').value = '';
+  $('nt').value = '';
+}
+
+$('yes').onclick = async () => {
+  if (!pending || !curUser) return;
+  const btn = $('yes');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  const newRecord = { id: pending.id, amount: pending.amount, note: pending.note, t: Date.now(), paid: true };
+  try {
+    await addDoc(collection(db, 'users', curUser.uid, 'sales'), newRecord);
+    salesCache.unshift(newRecord);
+    resetSale();
+    render();
+  } catch (e) {
+    alert('Failed to save payment. Please check your internet connection.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Yes, received';
+  }
+};
+$('no').onclick = resetSale;
+
+const pad = n => String(n).padStart(2, '0');
+const dayKey = t => { const d = new Date(t); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
+function dayLabel(k) {
+  if (k === dayKey(Date.now())) return 'Today';
+  if (k === dayKey(Date.now() - 864e5)) return 'Yesterday';
+  const p = k.split('-').map(Number);
+  return new Date(p[0], p[1] - 1, p[2]).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+}
+const total = a => a.reduce((p, x) => p + Number(x.amount), 0);
+const short = n => n >= 100000 ? (n / 100000).toFixed(1).replace('.0', '') + 'L' : n >= 1000 ? (n / 1000).toFixed(1).replace('.0', '') + 'k' : String(Math.round(n));
+
+function renderWeek(all) {
+  const days = [];
+  for (let i = 6; i >= 0; i--) { const t = Date.now() - i * 864e5; days.push({ k: dayKey(t), t, i }); }
+  const vals = days.map(d => total(all.filter(x => dayKey(x.t) === d.k)));
+  const sum = vals.reduce((p, v) => p + v, 0), max = Math.max.apply(null, vals.concat([1]));
+  const B = $('bars'); B.innerHTML = '';
+  days.forEach((d, j) => {
+    const c = document.createElement('div'); c.className = 'bar' + (vals[j] ? '' : ' z') + (d.i === 0 ? ' t' : '');
+    const v = document.createElement('b'); v.textContent = vals[j] ? short(vals[j]) : '';
+    const bar = document.createElement('i'); bar.style.height = Math.max(3, Math.round(vals[j] / max * 85)) + 'px';
+    const l = document.createElement('em'); l.textContent = d.i === 0 ? 'Today' : new Date(d.t).toLocaleDateString('en-IN', { weekday: 'short' });
+    c.append(v, bar, l); B.append(c);
+  });
+  $('wTot').textContent = 'Total ' + inr(sum);
+  let bi = 0; vals.forEach((v, j) => { if (v > vals[bi]) bi = j; });
+  $('wAvg').textContent = sum ? ('Daily average ' + inr(sum / 7) + ' \u00b7 Best day: ' + (days[bi].i === 0 ? 'Today' : dayLabel(days[bi].k)) + ' (' + inr(vals[bi]) + ')') : 'No confirmed sales in the last 7 days yet.';
+}
+
+function render() {
+  const all = salesCache.filter(x => x.paid !== false), tk = dayKey(Date.now());
+  const td = all.filter(x => dayKey(x.t) === tk);
+  $('sAll').textContent = inr(total(td)); $('sCnt').textContent = td.length; $('sTot').textContent = inr(total(all));
+  renderWeek(all);
+  const L = $('list'); L.innerHTML = '';
+  if (!all.length) { L.innerHTML = '<div class="empty">No confirmed sales yet.<br>Generate a QR and tap “Yes, received” after payment.</div>'; return; }
+  const groups = {};
+  all.forEach(x => { const k = dayKey(x.t); (groups[k] = groups[k] || []).push(x); });
+  Object.keys(groups).sort().reverse().forEach(k => {
+    const g = groups[k], h = document.createElement('div'); h.className = 'day' + (k === tk ? ' today' : '');
+    const a = document.createElement('span'); a.textContent = dayLabel(k);
+    const s = document.createElement('span'); s.textContent = inr(total(g)) + ' · ' + g.length + (g.length > 1 ? ' payments' : ' payment');
+    h.append(a, s); L.append(h);
+    g.forEach(x => {
+      const r = document.createElement('div'); r.className = 'row';
+      const l = document.createElement('div');
+      const b = document.createElement('b'); b.textContent = inr(x.amount);
+      const d = document.createElement('div'); d.className = 'small';
+      d.textContent = new Date(x.t).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) + (x.note ? ' · ' + x.note : '');
+      l.append(b, d);
+      const t = document.createElement('span'); t.className = 'tag paid'; t.style.cursor = 'default'; t.textContent = 'Received ✓';
+      r.append(l, t); L.append(r);
+    });
+  });
+}
+</script>
+</body>
+</html>
